@@ -78,6 +78,13 @@ pub fn build(b: *std.Build) !void {
     mcp_exe.linkLibC();
     mcp_exe.root_module.addImport("zqlite", zqlite.module("zqlite"));
 
+    const mcp_lib_dep = b.dependency("mcp", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
+    mcp_exe.root_module.addImport("mcp", mcp_lib_dep.module("mcp"));
+
     b.installArtifact(mcp_exe);
     const run_mcp = b.addRunArtifact(mcp_exe);
     run_mcp.step.dependOn(b.getInstallStep());

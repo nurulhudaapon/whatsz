@@ -12,6 +12,10 @@
             .url = "git+https://github.com/karlseguin/zqlite.zig?ref=master#b44ed5cdc64859b08446c246f307e65ebe2b2d9c",
             .hash = "zqlite-0.0.0-RWLaY_y_mADh2LdbDrG_2HT2dBAcsAR8Jig_7-dOJd0B",
         },
+        .mcp = .{
+            .url = "https://github.com/muhammad-fiaz/mcp.zig/archive/refs/tags/0.0.1.tar.gz",
+            .hash = "mcp-0.0.1-cIUFg6yUAgA8yYsHQhJvxOH18ymuqeFteEzWwcEqPArj",
+        },
     },
     .paths = .{
         "build.zig",
