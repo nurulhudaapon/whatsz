@@ -63,6 +63,67 @@ fn run() !void {
         .handler = &getGroupMembersHandler,
     });
 
+    try server.addTool(.{
+  .name = "get_unread_chats",
+  .description = "List chats with unread messages. Returns chat name/JID, unread count, last message text, and last message date. Optional: 'limit' (default 20).",
+  .handler = &getUnreadChatsHandler,
+});
+
+try server.addTool(.{
+  .name = "get_messages_by_date_range",
+  .description = "Get messages from a chat within a date range. Requires 'chat_name' (partial match) or 'chat_jid' (exact). Requires 'start_date' and 'end_date' (ISO-8601). Optional: 'limit' (default 50), 'offset'.",
+  .handler = &getMessagesByDateRangeHandler,
+});
+
+try server.addTool(.{
+  .name = "get_daily_message_volume",
+  .description = "Get daily message counts for the last N days. Optional: 'chat_name' or 'chat_jid' to scope to a single chat. Optional: 'days' (default 7). Returns counts per day and split by from_me vs from_them.",
+  .handler = &getDailyMessageVolumeHandler,
+});
+
+try server.addTool(.{
+  .name = "get_top_contacts",
+  .description = "Show top contacts/chats by message volume over the last N days. Optional: 'days' (default 30), 'limit' (default 20), 'include_groups' (default false).",
+  .handler = &getTopContactsHandler,
+});
+
+try server.addTool(.{
+  .name = "get_starred_messages",
+  .description = "List starred messages. Optional: 'chat_name' or 'chat_jid' to filter to a chat. Optional: 'limit' (default 50).",
+  .handler = &getStarredMessagesHandler,
+});
+
+try server.addTool(.{
+  .name = "get_media_messages",
+  .description = "List messages that contain media (images/videos/docs/audio). Optional: 'chat_name' or 'chat_jid'. Optional: 'media_type' (image|video|audio|document|any, default any), 'limit' (default 50). Returns media local path/url when available, title, filesize, and message date.",
+  .handler = &getMediaMessagesHandler,
+});
+
+try server.addTool(.{
+  .name = "list_muted_chats",
+  .description = "List chats that are muted or have notifications disabled. Optional: 'limit' (default 50). Returns mute until/date and alert settings.",
+  .handler = &listMutedChatsHandler,
+});
+
+try server.addTool(.{
+  .name = "get_group_activity_summary",
+  .description = "Get group activity summary for last N days. Requires 'group_name' (partial) or 'group_jid' (exact). Optional: 'days' (default 7). Returns member count, message count, top senders, and active hours.",
+  .handler = &getGroupActivitySummaryHandler,
+});
+
+try server.addTool(.{
+  .name = "find_unreplied_messages",
+  .description = "Find recent incoming messages you likely haven't replied to (heuristic). Requires 'chat_name' or 'chat_jid'. Optional: 'lookback_days' (default 7), 'limit' (default 50).",
+  .handler = &findUnrepliedMessagesHandler,
+});
+
+try server.addTool(.{
+  .name = "get_conversation_snippet",
+  .description = "Get a message window around a target time or message ID for context. Requires 'chat_name' or 'chat_jid'. Requires either 'around_date' (ISO-8601) or 'stanza_id'. Optional: 'before' (default 20) and 'after' (default 20).",
+  .handler = &getConversationSnippetHandler,
+});
+
+
     // Run with STDIO transport
     try server.run(.stdio);
 }
