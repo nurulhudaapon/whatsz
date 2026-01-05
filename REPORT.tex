@@ -38,6 +38,19 @@ numberstyle = \tiny,
 \usepackage{cite}
 \usepackage[colorlinks, linkcolor=black, anchorcolor=black, citecolor=black]{hyperref}
 \usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit, backgrounds, calc}
+
+% Define styles for diagrams
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!30]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!20]
+\tikzstyle{decision} = [diamond, minimum width=2.5cm, minimum height=1cm, text centered, draw=black, fill=green!20]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=2.5cm, minimum height=1cm, text centered, draw=black, fill=orange!20]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\tikzstyle{layer} = [rectangle, rounded corners, minimum width=12cm, minimum height=1.5cm, text centered, draw=black, fill=blue!10]
+\tikzstyle{component} = [rectangle, rounded corners, minimum width=2.5cm, minimum height=0.8cm, text centered, draw=black, fill=green!20]
+\tikzstyle{database} = [cylinder, shape border rotate=90, draw, minimum height=1.5cm, minimum width=2cm, fill=yellow!20]
+
 \setlength{\parskip}{0.5em}
 \title{WhatsZ: WhatsApp Conversation Management Server}
 %\author{\textup{Qi YUAN}}
@@ -157,6 +170,46 @@ The proposed system can be applied in several real-life scenarios, including:
     
 \end{itemize}
 
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=0.6cm]
+    % System boundary
+    \draw [rounded corners, thick, fill=gray!5] (-1,-5) rectangle (9,3);
+    \node at (4,2.5) [font=\bfseries] {WhatsZ System};
+    
+    % Actor
+    \node (user) at (-3,0) [circle, draw, minimum size=0.8cm] {};
+    \node at (-3,-0.7) [font=\small] {User/AI};
+    \draw (-3,0.4) -- (-3,0.8);
+    \draw (-3.3,0) -- (-2.7,0);
+    \draw (-3,-0.4) -- (-3.3,-1);
+    \draw (-3,-0.4) -- (-2.7,-1);
+    
+    % Use cases
+    \node (uc1) [ellipse, draw, fill=blue!10, minimum width=3cm, minimum height=0.8cm] at (4,2) {List Chats};
+    \node (uc2) [ellipse, draw, fill=blue!10, minimum width=3cm, minimum height=0.8cm] at (4,1) {Get Messages};
+    \node (uc3) [ellipse, draw, fill=blue!10, minimum width=3cm, minimum height=0.8cm] at (4,0) {Search Messages};
+    \node (uc4) [ellipse, draw, fill=blue!10, minimum width=3cm, minimum height=0.8cm] at (4,-1) {Get Chat Stats};
+    \node (uc5) [ellipse, draw, fill=blue!10, minimum width=3cm, minimum height=0.8cm] at (4,-2) {List Groups};
+    \node (uc6) [ellipse, draw, fill=blue!10, minimum width=3cm, minimum height=0.8cm] at (4,-3) {Get Group Members};
+    \node (uc7) [ellipse, draw, fill=green!10, minimum width=3cm, minimum height=0.8cm] at (4,-4.2) {MCP Transport};
+    
+    % Connections
+    \draw [-] (-2,-0.2) -- (uc1.west);
+    \draw [-] (-2,-0.2) -- (uc2.west);
+    \draw [-] (-2,-0.2) -- (uc3.west);
+    \draw [-] (-2,-0.2) -- (uc4.west);
+    \draw [-] (-2,-0.2) -- (uc5.west);
+    \draw [-] (-2,-0.2) -- (uc6.west);
+    
+    % Include relationship
+    \draw [dashed, ->] (uc1) -- node[right, font=\scriptsize] {<<uses>>} (uc7);
+    \draw [dashed, ->] (uc6) -- (uc7);
+\end{tikzpicture}
+\caption{Use Case Diagram for WhatsZ}
+\label{fig:usecase}
+\end{figure}
+
 
 % Chapter 1 ends here.....    
 
@@ -191,6 +244,44 @@ The proposed system can be applied in several real-life scenarios, including:
     \item \textbf{Pagination Support} – All list operations support limit and offset parameters for handling large datasets.
 \end{itemize}
 
+\subsection{Component Diagram}
+The following diagram shows the major components of the WhatsZ system and their dependencies:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=1cm]
+    % Main components
+    \node (main) [rectangle, draw, fill=red!20, minimum width=2.5cm, minimum height=1.2cm, align=center] {main.zig\\(Entry Point)};
+    
+    \node (mcp) [rectangle, draw, fill=blue!20, minimum width=2.5cm, minimum height=1.2cm, align=center, right=2cm of main] {mcp.zig\\(MCP Server)};
+    
+    \node (zqlite) [rectangle, draw, fill=green!20, minimum width=2.5cm, minimum height=1.2cm, align=center, below=1.5cm of main] {zqlite\\(DB Bindings)};
+    
+    \node (sqlite) [rectangle, draw, fill=yellow!20, minimum width=2.5cm, minimum height=1.2cm, align=center, below=1.5cm of mcp] {sqlite3.c\\(SQLite Core)};
+    
+    \node (std) [rectangle, draw, fill=purple!20, minimum width=2.5cm, minimum height=1.2cm, align=center, right=2cm of mcp] {std\\(Zig Stdlib)};
+    
+    % External
+    \node (wa) [cylinder, shape border rotate=90, draw, fill=orange!20, minimum height=1cm, minimum width=1.5cm, below=1.5cm of zqlite] {WhatsApp\\DB};
+    
+    \node (ai) [rectangle, draw, fill=gray!20, minimum width=2.5cm, minimum height=1.2cm, align=center, above=1.5cm of mcp] {AI Assistant\\(External)};
+    
+    % Dependencies
+    \draw [arrow] (main) -- (mcp);
+    \draw [arrow] (main) -- (zqlite);
+    \draw [arrow] (mcp) -- (std);
+    \draw [arrow] (zqlite) -- (sqlite);
+    \draw [arrow] (zqlite) -- (wa);
+    \draw [arrow, dashed] (ai) -- node[right, font=\small] {STDIO} (mcp);
+    
+    % Labels
+    \node [below=0.1cm of main, font=\scriptsize, text=gray] {Tool Handlers};
+    \node [below=0.1cm of mcp, font=\scriptsize, text=gray] {Protocol Layer};
+\end{tikzpicture}
+\caption{Component Dependency Diagram}
+\label{fig:components}
+\end{figure}
+
 \section{Implementation}
 
 \subsection{System Architecture}
@@ -202,6 +293,50 @@ The system follows a layered architecture consisting of:
     \item \textbf{Database Layer} – Manages SQLite connections and query execution using zqlite bindings.
     \item \textbf{Utility Layer} – Provides helper functions like timestamp conversion and string building.
 \end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=0.8cm]
+    % AI Layer
+    \node (ai) [layer, fill=purple!20, minimum width=13cm] {AI Assistant Layer (Claude / ChatGPT / Cursor)};
+    
+    % MCP Server Layer
+    \node (mcp) [layer, fill=blue!20, below=of ai, minimum width=13cm] {MCP Server Layer (Protocol Handler + STDIO Transport)};
+    
+    % Tool Handler Layer with individual tools
+    \node (tools) [layer, fill=green!10, below=of mcp, minimum width=13cm, minimum height=2.5cm] {};
+    \node at (tools.north) [anchor=north, yshift=-0.2cm] {\textbf{Tool Handler Layer}};
+    
+    % Individual tool boxes
+    \node (t1) [component, fill=green!30] at ($(tools.center)+(-4.5,0)$) {list\_chats};
+    \node (t2) [component, fill=green!30] at ($(tools.center)+(-1.5,0)$) {get\_messages};
+    \node (t3) [component, fill=green!30] at ($(tools.center)+(1.5,0)$) {search};
+    \node (t4) [component, fill=green!30] at ($(tools.center)+(4.5,0)$) {get\_stats};
+    
+    % Database Layer
+    \node (db) [layer, fill=orange!20, below=of tools, minimum width=13cm] {Database Layer (zqlite + SQLite Bindings)};
+    
+    % Utility Layer
+    \node (util) [layer, fill=yellow!20, below=of db, minimum width=13cm] {Utility Layer (Timestamp Conversion + String Builder)};
+    
+    % WhatsApp Database
+    \node (wadb) [database, below=of util, yshift=-0.3cm, minimum width=3cm] {WhatsApp\\SQLite DB};
+    
+    % Arrows
+    \draw [arrow] (ai) -- (mcp);
+    \draw [arrow] (mcp) -- (tools);
+    \draw [arrow] (tools) -- (db);
+    \draw [arrow] (db) -- (util);
+    \draw [arrow] (util) -- (wadb);
+    
+    % Labels
+    \node [right=0.5cm of ai, text=gray] {\small JSON-RPC};
+    \node [right=0.5cm of mcp, text=gray] {\small Tool Dispatch};
+    \node [right=0.5cm of db, text=gray] {\small SQL Queries};
+\end{tikzpicture}
+\caption{WhatsZ System Architecture Diagram}
+\label{fig:architecture}
+\end{figure}
 
 \subsection{Implemented Tools}
 The following tools are implemented in the system:
@@ -215,6 +350,39 @@ The following tools are implemented in the system:
     \item \textbf{get\_group\_members} – Retrieves members of a specific group with admin status and activity state.
 \end{enumerate}
 
+\subsection{Data Flow Diagram}
+The following diagram illustrates how data flows through the WhatsZ system from user request to response:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=1.2cm]
+    % Nodes
+    \node (user) [startstop] {User / AI Assistant};
+    \node (request) [io, below=of user] {MCP Request\\(JSON-RPC)};
+    \node (server) [process, below=of request] {MCP Server\\Parse \& Route};
+    \node (validate) [decision, below=of server, aspect=2] {Valid\\Args?};
+    \node (handler) [process, below=of validate] {Tool Handler\\Execute Query};
+    \node (db) [database, below=of handler, yshift=-0.2cm] {SQLite\\Database};
+    \node (format) [process, right=3cm of db] {Format Results\\(Markdown)};
+    \node (response) [io, above=of format] {MCP Response\\(Tool Result)};
+    \node (error) [startstop, left=3cm of handler, fill=red!40] {Error Response};
+    
+    % Arrows
+    \draw [arrow] (user) -- (request);
+    \draw [arrow] (request) -- (server);
+    \draw [arrow] (server) -- (validate);
+    \draw [arrow] (validate) -- node[anchor=west] {Yes} (handler);
+    \draw [arrow] (validate) -| node[anchor=south, pos=0.3] {No} (error);
+    \draw [arrow] (handler) -- (db);
+    \draw [arrow] (db) -- (format);
+    \draw [arrow] (format) -- (response);
+    \draw [arrow] (response) |- (user);
+    \draw [arrow] (error) |- (user);
+\end{tikzpicture}
+\caption{Data Flow Diagram for WhatsZ Request Processing}
+\label{fig:dataflow}
+\end{figure}
+
 
 \subsection{Tools and Libraries}
     \begin{itemize}
@@ -224,6 +392,67 @@ The following tools are implemented in the system:
         \item \textbf{ZX}: Web framework for the site component.
         \item \textbf{SQLite3}: Embedded database engine for reading WhatsApp data.
     \end{itemize}
+
+\subsection{Database Schema Diagram}
+The WhatsZ system interacts with WhatsApp's local SQLite database, which contains the following key tables:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=0.5cm]
+    % Chat Session Table
+    \node (chat) [rectangle, draw, fill=blue!15, minimum width=5cm, minimum height=3.5cm] {};
+    \node at (chat.north) [anchor=north, yshift=-0.1cm, font=\bfseries] {ZWACHATSESSION};
+    \node at (chat.north) [anchor=north, yshift=-0.6cm, align=left, font=\small\ttfamily] {
+        Z\_PK (PK)\\
+        ZCONTACTJID\\
+        ZPARTNERNAME\\
+        ZLASTMESSAGETEXT\\
+        ZUNREADCOUNT\\
+        ZSESSIONTYPE\\
+        ZARCHIVED
+    };
+    
+    % Message Table
+    \node (msg) [rectangle, draw, fill=green!15, minimum width=5cm, minimum height=3.5cm, right=2cm of chat] {};
+    \node at (msg.north) [anchor=north, yshift=-0.1cm, font=\bfseries] {ZWAMESSAGE};
+    \node at (msg.north) [anchor=north, yshift=-0.6cm, align=left, font=\small\ttfamily] {
+        Z\_PK (PK)\\
+        ZCHATSESSION (FK)\\
+        ZTEXT\\
+        ZMESSAGEDATE\\
+        ZISFROMME\\
+        ZMESSAGETYPE\\
+        ZPUSHNAME
+    };
+    
+    % Group Info Table
+    \node (group) [rectangle, draw, fill=orange!15, minimum width=4.5cm, minimum height=2.5cm, below=1.5cm of chat] {};
+    \node at (group.north) [anchor=north, yshift=-0.1cm, font=\bfseries] {ZWAGROUPINFO};
+    \node at (group.north) [anchor=north, yshift=-0.6cm, align=left, font=\small\ttfamily] {
+        Z\_PK (PK)\\
+        ZCREATIONDATE\\
+        ZCREATORJID
+    };
+    
+    % Group Member Table
+    \node (member) [rectangle, draw, fill=purple!15, minimum width=4.5cm, minimum height=2.5cm, below=1.5cm of msg] {};
+    \node at (member.north) [anchor=north, yshift=-0.1cm, font=\bfseries] {ZWAGROUPMEMBER};
+    \node at (member.north) [anchor=north, yshift=-0.6cm, align=left, font=\small\ttfamily] {
+        Z\_PK (PK)\\
+        ZCHATSESSION (FK)\\
+        ZCONTACTNAME\\
+        ZMEMBERJID\\
+        ZISADMIN
+    };
+    
+    % Relationships
+    \draw [arrow] (chat.east) -- node[above, font=\small] {1:N} (msg.west);
+    \draw [arrow] (chat.south) -- node[left, font=\small] {1:1} (group.north);
+    \draw [arrow] (chat.south east) -- node[above, font=\small, pos=0.7] {1:N} (member.north west);
+\end{tikzpicture}
+\caption{WhatsApp SQLite Database Schema (Key Tables)}
+\label{fig:schema}
+\end{figure}
 
 
 
@@ -254,6 +483,52 @@ The following tools are implemented in the system:
     \item Return tool result with content for MCP response.
 \end{enumerate}
 
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=0.8cm]
+    % Start
+    \node (start) [startstop, minimum width=2.5cm] {Start};
+    
+    % Parse Args
+    \node (parse) [process, below=of start] {Parse JSON Arguments};
+    
+    % Validate
+    \node (validate) [decision, below=of parse, aspect=2.2] {Required\\Params?};
+    
+    % Open DB
+    \node (opendb) [process, below=of validate] {Open SQLite DB\\(Read-Only)};
+    
+    % DB Check
+    \node (dbcheck) [decision, below=of opendb, aspect=2.2] {Connection\\OK?};
+    
+    % Execute Query
+    \node (query) [process, below=of dbcheck] {Execute SQL Query};
+    
+    % Format
+    \node (format) [process, below=of query] {Format as Markdown};
+    
+    % Return Success
+    \node (success) [startstop, below=of format, fill=green!30] {Return Result};
+    
+    % Error nodes
+    \node (err1) [startstop, right=2.5cm of validate, fill=red!30] {InvalidArgs\\Error};
+    \node (err2) [startstop, right=2.5cm of dbcheck, fill=red!30] {DB Connection\\Error};
+    
+    % Arrows
+    \draw [arrow] (start) -- (parse);
+    \draw [arrow] (parse) -- (validate);
+    \draw [arrow] (validate) -- node[anchor=east] {Yes} (opendb);
+    \draw [arrow] (validate) -- node[anchor=south] {No} (err1);
+    \draw [arrow] (opendb) -- (dbcheck);
+    \draw [arrow] (dbcheck) -- node[anchor=east] {Yes} (query);
+    \draw [arrow] (dbcheck) -- node[anchor=south] {No} (err2);
+    \draw [arrow] (query) -- (format);
+    \draw [arrow] (format) -- (success);
+\end{tikzpicture}
+\caption{Tool Handler Execution Flowchart}
+\label{fig:toolflow}
+\end{figure}
+
 \subsection{Error Handling}
 \begin{enumerate}
     \item Database connection failures return descriptive error messages.
@@ -261,6 +536,42 @@ The following tools are implemented in the system:
     \item Query failures are caught and reported gracefully.
     \item Resource not found errors are handled for missing chats/groups.
 \end{enumerate}
+
+\subsection{MCP Protocol Communication}
+The following sequence diagram illustrates how the MCP protocol enables communication between AI assistants and the WhatsZ server:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+    % Actors
+    \node (user) at (0,0) [rectangle, draw, fill=purple!20, minimum width=2cm, minimum height=0.8cm] {User};
+    \node (ai) at (4,0) [rectangle, draw, fill=blue!20, minimum width=2cm, minimum height=0.8cm] {AI Assistant};
+    \node (mcp) at (8,0) [rectangle, draw, fill=green!20, minimum width=2cm, minimum height=0.8cm] {WhatsZ MCP};
+    \node (db) at (12,0) [rectangle, draw, fill=yellow!20, minimum width=2cm, minimum height=0.8cm] {SQLite DB};
+    
+    % Lifelines
+    \draw [dashed] (0,-0.5) -- (0,-9);
+    \draw [dashed] (4,-0.5) -- (4,-9);
+    \draw [dashed] (8,-0.5) -- (8,-9);
+    \draw [dashed] (12,-0.5) -- (12,-9);
+    
+    % Messages
+    \draw [->, thick] (0,-1) -- node[above, font=\small] {Natural Language} (4,-1);
+    \draw [->, thick] (4,-2) -- node[above, font=\small] {tools/call (JSON-RPC)} (8,-2);
+    \draw [->, thick] (8,-3) -- node[above, font=\small] {SQL Query} (12,-3);
+    \draw [<-, thick] (8,-4) -- node[above, font=\small] {Result Rows} (12,-4);
+    \draw [->, thick, dashed] (8,-5) -- node[above, font=\small] {Format Markdown} (8,-5.5);
+    \draw [<-, thick] (4,-6) -- node[above, font=\small] {Tool Result} (8,-6);
+    \draw [->, thick, dashed] (4,-7) -- node[above, font=\small] {Generate Response} (4,-7.5);
+    \draw [<-, thick] (0,-8) -- node[above, font=\small] {Natural Language} (4,-8);
+    
+    % Labels
+    \node at (6,-1.5) [font=\scriptsize, text=gray] {STDIO Transport};
+    \node at (10,-3.5) [font=\scriptsize, text=gray] {Read-Only};
+\end{tikzpicture}
+\caption{MCP Protocol Communication Sequence}
+\label{fig:sequence}
+\end{figure}
 
 
 
