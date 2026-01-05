@@ -20,7 +20,7 @@ fn run() !void {
     const allocator = gpa.allocator();
 
     var server = mcp.Server.init(.{
-        .name = "whatz-mcp",
+        .name = "whatsz-mcp",
         .version = "1.0.0",
         .allocator = allocator,
     });

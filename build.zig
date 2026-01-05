@@ -40,7 +40,7 @@ pub fn build(b: *std.Build) !void {
         });
 
         const mcp_exe = b.addExecutable(.{
-            .name = "whatz_mcp",
+            .name = "whatsz_mcp",
             .root_module = b.createModule(.{
                 .root_source_file = b.path("src/main.zig"),
                 .target = target,
