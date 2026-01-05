@@ -29,60 +29,72 @@ fn run() !void {
     // Register WhatsApp tools
     try server.addTool(.{
         .name = "list_chats",
-        .description = "Retrieve a list of WhatsApp chats ordered by most recent activity. "
-        "Each result includes chat name, chat JID, last message preview, unread message count, "
-        "chat type (direct or group), archived status, and last message timestamp. "
-        "Optional parameter: 'limit' (integer, default: 20) to control the number of chats returned.",
-.handler = &listChatsHandler,
+        .description =
+        \\Retrieve a list of WhatsApp chats ordered by most recent activity.
+        \\Each result includes chat name, chat JID, last message preview, unread message count,
+        \\chat type (direct or group), archived status, and last message timestamp.
+        \\Optional parameter: 'limit' (integer, default: 20) to control the number of chats returned.
+        ,
+        .handler = &listChatsHandler,
     });
 
     try server.addTool(.{
         .name = "get_chat_messages",
-        .description = "Fetch messages from a specific WhatsApp chat. "
-        "You must provide either 'chat_name' (partial, case-insensitive match) "
-        "or 'chat_jid' (exact match). "
-        "Returns messages ordered from newest to oldest, including sender name, "
-        "message text, message type (text/media), and timestamp. "
-        "Optional parameters: 'limit' (integer, default: 50) and 'offset' (integer) for pagination.",
-     .handler = &getChatMessagesHandler,
+        .description =
+        \\Fetch messages from a specific WhatsApp chat.
+        \\You must provide either 'chat_name' (partial, case-insensitive match)
+        \\or 'chat_jid' (exact match)
+        \\Returns messages ordered from newest to oldest, including sender name,
+        \\message text, message type (text/media), and timestamp.
+        \\Optional parameters: 'limit' (integer, default: 50) and 'offset' (integer) for pagination.
+        ,
+        .handler = &getChatMessagesHandler,
     });
 
     try server.addTool(.{
         .name = "search_messages",
-        .description = "Search across all WhatsApp chats for messages containing a specific text string. "
-        "Requires the 'query' parameter (string). "
-        "Results include chat name, sender, message text, and timestamp, "
-        "ordered by most recent message first. "
-        "Optional parameter: 'limit' (integer, default: 50).",
-      .handler = &searchMessagesHandler,
+        .description =
+        \\Search across all WhatsApp chats for messages containing a specific text string.
+        \\Requires the 'query' parameter (string).
+        \\Results include chat name, sender, message text, and timestamp,
+        \\ordered by most recent message first.
+        \\Optional parameter: 'limit' (integer, default: 50).
+        ,
+        .handler = &searchMessagesHandler,
     });
 
     try server.addTool(.{
         .name = "get_chat_stats",
-        .description =  "Retrieve statistical insights for a specific WhatsApp chat. "
-        "Requires either 'chat_name' (partial match) or 'chat_jid' (exact match). "
-        "Returns total message count, messages sent vs received, "
-        "first and last message timestamps, and media statistics "
-        "(image, video, and audio message counts).",
-  .handler = &getChatStatsHandler,
+        .description =
+        \\Retrieve statistical insights for a specific WhatsApp chat.
+        \\Requires either 'chat_name' (partial match) or 'chat_jid' (exact match).
+        \\Returns total message count, messages sent vs received,
+        \\first and last message timestamps, and media statistics
+        \\(image, video, and audio message counts).
+        ,
+        .handler = &getChatStatsHandler,
     });
 
     try server.addTool(.{
         .name = "list_groups",
-        "List all WhatsApp group chats ordered by recent activity. "
-        "Each group includes group name, group JID, creation date, creator JID, "
-        "and total member count. "
-        "Optional parameter: 'limit' (integer, default: 20).",
-       .handler = &listGroupsHandler,
+        .description =
+        \\List all WhatsApp group chats ordered by recent activity.
+        \\Each group includes group name, group JID, creation date, creator JID,
+        \\and total member count.
+        \\Optional parameter: 'limit' (integer, default: 20).
+        ,
+        .handler = &listGroupsHandler,
     });
 
     try server.addTool(.{
         .name = "get_group_members",
-        .description = "Retrieve the member list of a specific WhatsApp group. "
-        "Requires either 'group_name' (partial match) or 'group_jid' (exact match). "
-        "Returns each member’s name, JID, admin status, and active/left status, "
-        "with admins listed first.",
-   .handler = &getGroupMembersHandler,
+        .description =
+        \\Retrieve the member list of a specific WhatsApp group.
+        \\Requires either 'group_name' (partial match) or 'group_jid' (exact match).
+        \\Returns each member's name, JID, admin status, and active/left status,
+        \\with admins listed first.
+        ,
+        .handler = &getGroupMembersHandler,
     });
 
     // Run with STDIO transport
