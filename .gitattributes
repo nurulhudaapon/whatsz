@@ -1,2 +1,2 @@
-vendor/** linguist-generated
+lib/** linguist-generated
 *.zx text eol=lf linguist-language=Zig
